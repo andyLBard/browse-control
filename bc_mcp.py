@@ -91,7 +91,7 @@ async def browse_site(**kwargs):
     results = {"links": [], "images":[], "text":""}
     body = BS4(resp, "html.parser")
     results["links"] = [urlparse.urljoin(tmp_url , a.get("href","")) for a in body.find_all("a", class_=kwargs.get("link_class", True))]
-    results["images"] = [urlparse.urljoin(tmp_url, img.get("href","")) for img in body.find_all("img", class_=kwargs.get("img_class", True))]
+    results["images"] = [urlparse.urljoin(tmp_url, img.get("src","")) for img in body.find_all("img", class_=kwargs.get("img_class", True))]
     results["text"] = resp
 
     #check for selector
@@ -118,7 +118,6 @@ async def get_limited_spider_contents(url, link_class=None):
     visited_links = set()
     visited_links.add(url)
     links = await get_links(url)
-    links = links
     for link in links:
         all_links.add(link)
 
