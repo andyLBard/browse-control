@@ -37,7 +37,7 @@ def is_url_allowed(url):
     return allowed
 
 #NOTHING ABOVE THIS LINE CALLS REQUESTS!
-#THIS SHOULD BE ONE OF ONLY TWO METHODS ACTUALLY CALLING REQUESTS!!
+#THIS SHOULD BE ONE OF ONLY Three METHODS ACTUALLY CALLING REQUESTS!!
 async def make_allowed_get(**kwargs):
     req = {}
     req["url"] = kwargs.get("url", "NULL")
@@ -57,7 +57,8 @@ async def make_allowed_get(**kwargs):
         return {"code": 0, "msg": "Success", "results": r }
 
 
-#THIS SHOULD BE ONE OF ONLY TWO METHODS ACTUALLY CALLING REQUESTS!!
+#THIS SHOULD BE ONE OF ONLY Three METHODS ACTUALLY CALLING REQUESTS!!
+#CURRENTLY UNUSED, will be updated
 def make_allowed_post(**kwargs):
     req = {}
     req["url"] = kwargs.get("url", "NULL")
@@ -70,6 +71,15 @@ def make_allowed_post(**kwargs):
     else:
         r = session.post(req["url"], headers=req["headers"], data=req["body"])
         return r
+#last one that makes requests directly
+@mcp.tool()
+def get_image_contents(url):
+    if is_url_allowed(url):
+        img_data = session.get(url)
+        content64 = base64.b64encode(img_data.content).decode('utf-8')
+        return ImageContent(type="image", data=content64, mimeType=img_data.headers["content-type"])
+    else:
+        return ""
 ##NOTHING BELOW THIS LINE CALLS REQUESTS!
 
 async def browse_site(**kwargs):
@@ -100,15 +110,6 @@ async def get_links(url, link_class=None, link_attr=None):
 async def get_images_from_url(url, img_class=None):
     browse = await browse_site(url=url, img_class=img_class)
     return browse["images"]
-
-@mcp.tool()
-def get_image_contents(url):
-    if is_url_allowed(url):
-        img_data = session.get(url)
-        content64 = base64.b64encode(img_data.content).decode('utf-8')
-        return ImageContent(type="image", data=content64, mimeType=img_data.headers["content-type"])
-    else:
-        return ""
 
 @mcp.tool()
 async def get_limited_spider_contents(url, link_class=None):
