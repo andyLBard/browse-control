@@ -1,4 +1,4 @@
-
-bcmp/
+bcmcp/
 *.sqlite
 __*
+*.swp

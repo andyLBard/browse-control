@@ -12,13 +12,18 @@ import yaml
 ALLOWED_SOURCES = []
 LOADING_WAIT_TIME = 5000
 MAX_SPIDERING_DEPTH = 1
+DEFAULT_AL_TERM = ":"
 
 #Open the yaml file to pull the allowlist, read it into the global variable
 #and close the file, just pass and keep the sources empty if the yaml is unreadable
 with open("allowlist.yml") as f:
     try:
         tmp_sources = yaml.safe_load(f)
-        ALLOWED_SOURCES = [s.strip() for s in tmp_sources]
+	#improve the protection of the allowlist.
+        for source in tmp_sources:
+            if source.strip()[-1] not in ["/", ":"]:
+                source = source.strip() + DEFAULT_AL_TERM
+        ALLOWED_SOURCES = [ s for s in tmp_sources ]
     except:
         pass
 
@@ -44,7 +49,7 @@ async def make_allowed_get(**kwargs):
     req["headers"] = kwargs.get("headers", [])
     allowed = is_url_allowed(req["url"])
     if not allowed: #return with an error that's a bit big but nice to the caller
-        return {"code": -1, "msg": "Violates whitelist", "results": {} }
+        return {"code": -1, "msg": "Violates allowlist", "results": {} }
     else:
         r = ""
         async with async_playwright() as pw:
@@ -59,18 +64,19 @@ async def make_allowed_get(**kwargs):
 
 #THIS SHOULD BE ONE OF ONLY Three METHODS ACTUALLY CALLING REQUESTS!!
 #CURRENTLY UNUSED, will be updated
-def make_allowed_post(**kwargs):
-    req = {}
-    req["url"] = kwargs.get("url", "NULL")
-    req["headers"] = kwargs.get("headers", [])
-    req["body"] = kwargs.get("body", {})
+#def make_allowed_post(**kwargs):
+#    req = {}
+#    req["url"] = kwargs.get("url", "NULL")
+#    req["headers"] = kwargs.get("headers", [])
+#    req["body"] = kwargs.get("body", {})
 
-    allowed = is_url_allowed()
-    if not allowed: #return with an error that's a bit big but nice to the caller
-        return {"code": -1, "msg": "Violates whitelist", "results": {} }
-    else:
-        r = session.post(req["url"], headers=req["headers"], data=req["body"])
-        return r
+#    allowed = is_url_allowed(req["url"])
+#    if not allowed: #return with an error that's a bit big but nice to the caller
+#        return {"code": -1, "msg": "Violates allowlist", "results": {} }
+#    else:
+#        r = session.post(req["url"], headers=req["headers"], data=req["body"])
+#        return r
+
 #last one that makes requests directly
 @mcp.tool()
 def get_image_contents(url):
@@ -95,9 +101,9 @@ async def browse_site(**kwargs):
     results["text"] = resp
 
     #check for selector
-    sel = kwargs.get("selector", "NULL")
-    if sel != "NULL":
-        results["selection"] = [el.outerHTML for el in body.select(sel)]
+    #sel = kwargs.get("selector", "NULL")
+    #if sel != "NULL":
+    #    results["selection"] = [el.outerHTML for el in body.select(sel)]
 
     return results
 
@@ -117,7 +123,7 @@ async def get_limited_spider_contents(url, link_class=None):
     all_links = set()
     visited_links = set()
     visited_links.add(url)
-    links = await get_links(url)
+    links = await get_links(url, link_class)
     for link in links:
         all_links.add(link)
 
@@ -125,7 +131,7 @@ async def get_limited_spider_contents(url, link_class=None):
        for link in all_links.copy():
           if link not in visited_links:
               try:
-                  sub_step = await get_links(link)
+                  sub_step = await get_links(link, link_class)
                   for ssstep in sub_step:
                       all_links.add(ssstep)
               except:
@@ -136,16 +142,19 @@ async def get_limited_spider_contents(url, link_class=None):
 
 #this one doesn't work yet, no idea why bs4.select is returning nothing no matter what selector i send it.
 #@mcp.tool()
-async def get_elements_by_selector(url, selector, headers=[]):
-    req = {}
-    req["url"] = url
-    req["headers"] = headers
-    req["selector"] = selector
-    b = await browse_site(**req)
-    print(b)
-    return b["selection"]
+#async def get_elements_by_selector(url, selector, headers=[]):
+#    req = {}
+#    req["url"] = url
+#    req["headers"] = headers
+#    req["selector"] = selector
+#    b = await browse_site(**req)
+#    print(b)
+#    return b["selection"]
 
-mcp.run(transport="streamable-http")
+#I went the janktastic route of execing this whole file from the other servers instead of extending objects
+#I should not have done that, however, if you want to run the base server without wikipedia, uncomment these two lines:
+#if __name__ == "__main__":
+#    mcp.run(transport="streamable-http")
 
 #async def main():
 #    c = await get_limited_spider_contents("http://localhost:8888/")
