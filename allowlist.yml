@@ -1,5 +1,5 @@
 #only these sources are allowed, be sure to start with your protocol
 # the match begins at the beginning of the line, but in this file, you need
 # to start with the - so the yaml is parsed as a list.
-- http://localhost
+- http://localhost:
 - https://en.wikipedia.org/
