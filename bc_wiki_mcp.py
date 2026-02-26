@@ -25,10 +25,10 @@ with open("bc_mcp.py") as base_server:
         doc = BS4(page["text"], "html.parser")
         return "\n".join([p.text for p in doc.find("div", class_="mw-content-ltr").find_all("p")])
     
-#    async def main():
-#        c = await search_wikipedia("war")
-#        print(c)
+    #async def main():
+    #    c = await get_images_from_url("https://en.wikipedia.org/wiki/Paul_Thomas_Anderson")
+    #    print(c)
 
-#    asyncio.run(main())
+    #asyncio.run(main())
 
     mcp.run(transport="streamable-http")

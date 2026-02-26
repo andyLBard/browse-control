@@ -96,8 +96,9 @@ async def browse_site(**kwargs):
     resp = initial_resp["results"]
     results = {"links": [], "images":[], "text":""}
     body = BS4(resp, "html.parser")
-    results["links"] = [urlparse.urljoin(tmp_url , a.get("href","")) for a in body.find_all("a", class_=kwargs.get("link_class", True))]
-    results["images"] = [urlparse.urljoin(tmp_url, img.get("src","")) for img in body.find_all("img", class_=kwargs.get("img_class", True))]
+    print(resp)
+    results["links"] = [urlparse.urljoin(tmp_url , a.get("href","")) for a in body.find_all("a", class_=kwargs.get("link_class", None))]
+    results["images"] = [urlparse.urljoin(tmp_url, img.get("src","")) for img in body.find_all("img", class_=kwargs.get("img_class", None))]
     results["text"] = resp
 
     #check for selector
