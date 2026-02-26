@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 class _abstractSource(ABC):
     @abstractmethod
-    def bootstrap_connection(self):
+    def bootstrap_connection(self, connection_kwargs):
         pass
     @abstractmethod
     def get_query_results(self, query):

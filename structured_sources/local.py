@@ -1,10 +1,11 @@
 import sqlalchemy
 import pandas as pd
-import io
+import os
 import sys
 from enum import Enum
+from structured_sources.source_connection import FileDirectory
 
-from _abstracts import _abstractSource, _abstractSourceConnection
+from structured_sources._abstracts import _abstractSource, _abstractSourceConnection
 
 class LSS_TYPES(Enum):
     CSV_DIR = 1
@@ -14,14 +15,17 @@ class LSS_TYPES(Enum):
     FILE_DIR = 5
 
 class LocalStructuredSource(_abstractSource):
-    def __init__(self, type=LSS_TYPES.CSV_DIR.name, **connection_kwargs):
-        pass
+    def __init__(self, type=LSS_TYPES.FILE_DIR.name):
+        self.type = type
 
-    def bootstrap_connection(self):
-        pass
+    def bootstrap_connection(self, connection_kwargs):
+        if self.type == LSS_TYPES.FILE_DIR.name:
+            self.source_connection = FileDirectory(**connection_kwargs)
+        else:
+            self.source_connection = {}
 
-    def get_query_results(self, query):
-        pass
+    def get_query_results(self, query={}):
+        return self.source_connection.execute_query(**query)
 
 
 
@@ -31,5 +35,8 @@ class LocalStructuredSource(_abstractSource):
 
 ##testiing
 
-if __name__=="__main__":
-    lss = LocalStructuredSource()
+#def main():
+#    lss = LocalStructuredSource()    
+
+#if __name__=="__main__":
+#    main()

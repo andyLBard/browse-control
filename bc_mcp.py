@@ -7,6 +7,7 @@ import urllib.parse as urlparse
 import yaml
 
 import web_source
+from structured_sources import local as LSS
 
 ALLOWED_SOURCES = []
 LOADING_WAIT_TIME = 5000
@@ -36,6 +37,9 @@ def is_url_allowed(url):
            allowed = True
            break
     return allowed
+
+def bootstrap():
+    pass #this will run everything that needs to run just once at startup, starting with bootstrapping file directory lss
 
 def make_response(code=0, msg="Success", results=None):
     ret = {}
@@ -99,6 +103,7 @@ async def get_images_from_url(url, img_selector="img"):
 #I went the janktastic route of execing this whole file from the other servers instead of extending objects
 #I should not have done that, however, if you want to run the base server without wikipedia, uncomment these two lines:
 if __name__ == "__main__":
+    bootstrap()
     mcp.run(transport="streamable-http")
 
 #async def main():
