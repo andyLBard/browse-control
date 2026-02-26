@@ -2,3 +2,4 @@ bcmcp/
 *.sqlite
 __*
 *.swp
+__pycache__/

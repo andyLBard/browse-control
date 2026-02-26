@@ -26,6 +26,12 @@ async def get_links(url, page=None, needs_js=False):
     links = [a for a in page.css("a::attr(href)").getall()]
     return links
 
+async def get_images(url, page=None, needs_js=False):
+    if page is None:
+        page = await get_page(url=url, needs_js=needs_js)
+    imgs = [img for img in page.css("img::attr(src)").getall()]
+    return imgs
+
 async def get_html_contents(url, content_selector="html", needs_js=False, page=None):
     if page is None:
         page = await get_page(url=url, needs_js=needs_js)
@@ -38,9 +44,6 @@ async def get_binary_file_contents(url):
     ret["contents"] = page.body
     ret["filetype"] = page.headers["content-type"]
     return ret
-
-
-
 
 
 ##Testing
