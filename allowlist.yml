@@ -3,3 +3,4 @@
 # to start with the - so the yaml is parsed as a list.
 - 'http://localhost:'
 - https://en.wikipedia.org/
+- https://upload.wikimedia.org/
